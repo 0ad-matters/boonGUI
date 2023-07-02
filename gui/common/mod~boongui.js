@@ -18,10 +18,40 @@ function modToString(mod)
 // Idea of @nani's autociv mod, makes it much easier to load additional code for this mod,
 //  without copying all the legacy code into the mod.
 
-const autociv_patchApplyN = (...args) => {
-	const [method, patch] = args;
-	global[method] = new Proxy(global[method], { "apply": patch });
-};
+function autociv_patchApplyN()
+{
+    if (arguments.length < 2)
+    {
+        let error = new Error("Insufficient arguments to patch: " + arguments[0]);
+        warn(error.message)
+        warn(error.stack)
+        return;
+    }
+
+    let prefix, method, patch;
+    if (arguments.length == 2)
+    {
+        prefix = global;
+        method = arguments[0];
+        patch = arguments[1];
+    }
+    else
+    {
+        prefix = arguments[0];
+        method = arguments[1];
+        patch = arguments[2];
+    }
+
+    if (!(method in prefix))
+    {
+        let error = new Error("Function not defined: " + method);
+        warn(error.message)
+        warn(error.stack)
+        return;
+    }
+
+    prefix[method] = new Proxy(prefix[method], { apply: patch });
+}
 
 const boonGUI_ColorsSeenBefore = new Map();
 
