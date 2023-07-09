@@ -1,6 +1,23 @@
 /**
  * IMPORTANT: Remember to update session/top_panel/BuildLabel.xml in sync with this.
  */
+let modsString = '';
+for (let [key, value] of Object.entries(Engine.GetEngineInfo().mods)) {
+		if(key<1) continue;
+		for (let [key2, value2] of Object.entries(Engine.GetEngineInfo().mods[key])) {
+			if(key2 != 'name' && key2 != 'version') continue;
+			modsString += ` ${value2}`; // mod/name/version : ... 
+		}
+}
+
+const versionName = Engine.GetEngineInfo().mods[0]['name'];
+const versionOf0ad = Engine.GetEngineInfo().mods[0]['version']; // 0.0.26
+if(versionName != '0ad')
+	error(versionName + ' | ' +  versionOf0ad + '. name should by 0ad. hmmm. strange.');
+
+modsString = modsString.replace(/\s+([a-z])/gi , "\n$1"  ) ; 
+modsString = modsString.replace(/\s+(proGUI)/g , "\n$1(boonGUI, BetterQuickStart)"  ) ; 
+modsString = modsString.replace(/\s+(autocivP)/g , "\n$1(autociv)"  ) ; 
 var g_ProjectInformation = {
 	"organizationName": {
 		"caption": translate("WILDFIRE GAMES")
@@ -15,8 +32,10 @@ var g_ProjectInformation = {
 		"caption": getBuildString()
 	},
 	"productDescription": {
-		"caption": `${setStringTags(translate("Alpha XXVI: Zhuangzi"), { "font": "sans-bold-18" })}\n${
-			setStringTags(translate(`boonGUI ${Engine.GetEngineInfo().mods.find(obj => obj.name == "boonGUI").version}`), { "font": "sans-16" })}`
+		"caption": setStringTags(translate("Alpha XXVI: Zhuangzi"), { "font": "sans-bold-18" })
+		 + "\n"
+		 + setStringTags(translate(modsString.trim(), { "font": "sans-16" }))
+		 + "\n"
 	}
 };
 var g_CommunityButtons = [
